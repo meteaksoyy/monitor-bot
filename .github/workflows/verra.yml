@@ -1,1 +1,41 @@
+name: Verra Monitor Bot
 
+on:
+  schedule:
+    - cron: "*/5 * * * *" # check every 5 minutes
+  workflow_dispatch:       # manual run
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with: 
+          python-version : "3.10"
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Load previous cache
+        run: | 
+          if [ ! -f cache.json ]; then echo "[]" > cache.json; fi
+
+      - name: Run script
+        env:
+          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+          BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+          BOT_TO: ${{ secrets.BOT_TO }}
+        run: python verra_bot.py
+
+      - name: Save updated cache
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "cache.json"
+          message: "update cache"
+          default_author: github_actions
+      
+      
