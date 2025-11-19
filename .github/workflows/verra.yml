@@ -1,4 +1,4 @@
-name: Verra Monitor Bot
+name: Monitor Bot
 
 on:
   schedule:
@@ -20,11 +20,12 @@ jobs:
       - name: Install deps
         run: pip install requests beautifulsoup4
 
-      - name: Load previous cache
+      - name: Load previous caches
         run: | 
-          if [ ! -f cache.json ]; then echo "[]" > cache.json; fi
+          if [ ! -f verra_cache.json ]; then echo "[]" > verra_cache.json; fi
+          if [ ! -f plaza_cache.json ]; then echo "[]" > plaza_cache.json; fi
 
-      - name: Run script
+      - name: Run Verra bot
         env:
           BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
@@ -32,11 +33,21 @@ jobs:
           BOT_TO_2: ${{ secrets.BOT_TO_2 }}
         run: python verra_bot.py
 
-      - name: Save updated cache
+      - name: Run Plaza bot
+        env:
+          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+          BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+          BOT_TO: ${{ secrets.BOT_TO }}
+          BOT_TO_2: ${{ secrets.BOT_TO_2 }}
+        run: python plaza_bot.py
+
+      - name: Save updated caches
         uses: EndBug/add-and-commit@v9
         with:
-          add: "cache.json"
-          message: "update cache"
+          add: |
+            verra_cache.json
+            plaza_cache.json
+          message: "update caches"
           default_author: github_actions
       
       
