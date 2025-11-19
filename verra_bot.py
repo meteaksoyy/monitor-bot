@@ -5,7 +5,7 @@ import os
 from bs4 import BeautifulSoup
 
 API_URL = "https://www.verra.nl/en/realtime-listings/consumer"
-CACHE_FILE = "cache.json"
+CACHE_FILE = "verra_cache.json"
 
 EMAIL = os.environ["BOT_EMAIL"]
 PASSWORD = os.environ["BOT_PASSWORD"]
