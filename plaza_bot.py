@@ -17,7 +17,7 @@ def fetch_ids():
   except Exception as e:
     print("FETCH ERROR: ", e)
     return []
-  if "list" not in data:
+  if "data" not in data:
     print("UNEXPECTED JSON: ", data)
     return []
   listings = data["data"]
