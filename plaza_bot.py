@@ -13,7 +13,7 @@ TO_2 = os.environ["BOT_TO_2"]
 
 def fetch_ids():
   try:
-    data = requests.get(API_URL, timeout=15).json
+    data = requests.get(API_URL, timeout=15).json()
   except Exception as e:
     print("FETCH ERROR: ", e)
     return []
