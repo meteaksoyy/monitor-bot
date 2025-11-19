@@ -20,7 +20,7 @@ def fetch_ids():
   if "list" not in data:
     print("UNEXPECTED JSON: ", data)
     return []
-  listings = data["list"]
+  listings = data["data"]
 
   print("DEBUG SAMPLE: ", listings[:2])
 
