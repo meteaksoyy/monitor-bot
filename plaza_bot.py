@@ -29,6 +29,8 @@ def fetch_ids():
     item for item in listings
     if item.get("gemeenteGeoLocatieNaam") == "Delft"
     and item.get("rentBuy") == "Huur"
+    and isinstance(item.get("totalRent"), (int, float))
+    and item.get("totalRent") > 100
   ]
   return [item["id"] for item in filtered]
 
