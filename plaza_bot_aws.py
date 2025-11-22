@@ -33,11 +33,12 @@ def fetch_ids():
   return filtered
 
 def notify(msg):
+  email_text = f"Subject: Plaza Bot Alert\n\n{msg}"
   recipients = [TO_1, TO_2]
   server = smtplib.SMTP("smtp.gmail.com", 587)
   server.starttls()
   server.login(EMAIL, PASSWORD)
-  server.sendmail(EMAIL, recipients, msg)
+  server.sendmail(EMAIL, recipients, email_text)
   server.quit()
 
 try:
