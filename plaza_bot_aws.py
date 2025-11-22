@@ -38,6 +38,7 @@ def notify(msg):
   server.starttls()
   server.login(EMAIL, PASSWORD)
   server.sendmail(EMAIL, recipients, msg)
+  server.quit()
 
 try:
   old_ids = json.load(open(CACHE_FILE))
@@ -52,7 +53,7 @@ if added:
   for item in added:
     address = f"{item.get('street', '')} {item.get('houseNumber', '')} {item.get('houseNumberAddition', '')}".strip()
     lines.append(f"- {address} (ID: {item['id']})")
-    msg = "New Plaza Listings in Delft:\n\n" + "\n".join(lines)
+  msg = "New Plaza Listings in Delft:\n\n" + "\n".join(lines)
   notify(msg)
 
 json.dump(new_ids, open(CACHE_FILE, "w"))
