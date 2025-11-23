@@ -20,6 +20,11 @@ LOGIN_URL = "https://plaza.newnewnew.space/portal/proxy/frontend/api/v1/oauth/to
 APPLY_URL = "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
 META_URL = "https://plaza.newnewnew.space/portal/object/frontend/getreageerconfiguration/format/json"
 
+GENDER_ID = 0
+INITIALS = "MA"
+POSTCODE = "2613DD"
+HUISNUMMER = "89"
+
 
 
 # -----------------------------------------------------------------
@@ -91,31 +96,17 @@ def fetch_metadata(session, dwelling_id):
 
   data = r.json()
 
-  if "elements" not in data or "reactionData" not in data:
-    raise Exception("Invalid metadata format")
+  if "reageerConfiguration" not in data:
+    raise Exception("Invalid metadata: missing reageerConfiguration")
+  config = data["reageerConfiguration"]
+  elements = config.get("elements", {})
   
-  elements = data["elements"]
-  __id__ = elements.get("__id__", "")
-  __hash__ = elements.get("__hash__", "")
-  genderId = elements.get("genderId", "")
+  hash_block = elements.get("__hash__", {})
+  hash_value = hash_block.get("initialData", "")
+  if not hash_value:
+    raise Exception("Missing hash value in metadata")
+  return hash_value
   
-  url_params = data["reactionData"].get("url", "")
-  
-  url_params = url_params.lstrip("?")
-  parts = dict(pair.split("=") for pair in url_params.split("&"))
-  add = parts.get("add")
-  dwellingID = parts.get("dwellingID")
-  if not add or not dwellingID:
-    raise Exception("Missing add/dwellingID in metadata")
-  return {
-    "__id__": __id__,
-    "__hash__": __hash__,
-    "genderId": genderId,
-    "add": add,
-    "dwellingID": dwellingID,
-    "reactieMotivatie": ""
-  }
-
 # ---------
 # APPLY
 # ---------
@@ -145,22 +136,41 @@ if added:
     msg_lines = []
     for item in added:
       dwelling_id = str(item["id"])
+      reaction_url = item.get("reactionData", {}).get("url", "")
       try:
-        meta = fetch_metadata(session, dwelling_id)
+        params = dict(pair.split("=") for pair in reaction_url.lstrip("?").split("&"))
+        add_value = params.get("add")
+        dynamic_dwelling = params.get("dwellingID")
       except Exception as e:
-        notify(f"Metadata fetch error for ID {dwelling_id}: {e}")
+        add_value = None
+        dynamic_dwelling = None
+      if not add_value or not dynamic_dwelling:
+        msg_lines.append(f"- ID {dwelling_id}: missing add/dwellingID")
         continue
       
-      address = f"{item.get('street', '')} {item.get('houseNumber','')} {item.get('houseNumberAddition', '')}".strip()
-      url_key = item.get("urlKey", "")
-      detail_url = f"{PLAZA_BASE}/en/availables-places/living-place/details/{url_key}"
       try:
-        apply_result = apply_to_listing(session, meta)
-        apply_msg = f"Applied successfully: {apply_result}"
+        hash_val = fetch_metadata(session, dwelling_id)
       except Exception as e:
-        apply_msg = f"Apply failed: {e}"
-      msg_lines.append(f"- {address} (ID: {item['id']})\n {detail_url}\n {apply_msg}\n")
-    final_msg = "New Plaza Listings in Delft:\n\n" + "\n".join(msg_lines)
-    notify(final_msg)
+        msg_lines.append(f"- ID {dwelling_id}: metadata error: {e}")
+        continue
+
+      payload = {
+        "__id__":"",
+        "__hash__": hash_val,
+        "genderID": GENDER_ID,
+        "initials": INITIALS,
+        "postcode": POSTCODE,
+        "huisnummer": HUISNUMMER,
+        "reactieMotivatie": "",
+        "add": add_value,
+        "dwellingID": dynamic_dwelling
+      }
+
+      try:
+        result = apply_to_listing(session, payload)
+        msg_lines.append(f"- {dwelling_id} applied successfully -> {result}")
+      except Exception as e:
+        msg_lines.append(f"- {dwelling_id} apply failed -> {e}")
+    notify("\n".join(msg_lines))
 # save cache
 json.dump(new_ids, open(CACHE_FILE, "w"))
