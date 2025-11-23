@@ -63,7 +63,7 @@ def login(session: requests.Session):
   session.headers.update({
       "User-Agent": "Mozilla/5.0",
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "Content-Type": "application/json",
       "Origin": "https://plaza.newnewnew.space",
       "Referer": "https://plaza.newnewnew.space/",
   })
