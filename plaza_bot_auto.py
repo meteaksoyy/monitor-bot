@@ -3,10 +3,7 @@ import json
 import smtplib
 import os
 
-API_URL = (
-    "https://mosaic-plaza-aanbodapi.zig365.nl/api/v1/actueel-aanbod"
-    "?limit=60&locale=en_GB&page=0&sort=+reactionData.aangepasteTotaleHuurprijs"
-)
+API_URL = "https://mosaic-plaza-aanbodapi.zig365.nl/api/v1/actueel-aanbod?limit=60&locale=en_GB&page=0&sort=+reactionData.aangepasteTotaleHuurprijs"
 
 CACHE_FILE = "plaza_cache_auto.json"
 
