@@ -61,8 +61,10 @@ def fetch_ids():
 # ------------------------------------------------
 def login(session: requests.Session):
   session.headers.update({
+      "Host": "plaza.newnewnew.space",
       "User-Agent": "Mozilla/5.0",
       "Accept": "application/json",
+      "Accept-Language": "nl_NL",
       "Content-Type": "application/json",
       "Origin": "https://plaza.newnewnew.space",
       "Referer": "https://plaza.newnewnew.space/",
