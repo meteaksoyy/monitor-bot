@@ -18,6 +18,7 @@ PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 PLAZA_BASE = "https://plaza.newnewnew.space"
 LOGIN_URL = "https://plaza.newnewnew.space/portal/proxy/frontend/api/v1/oauth/token"
 APPLY_URL = "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
+FORM_URL = "https://plaza.newnewnew.space/portal/html/angular-templates/objecten/shared/object/ReageerForm.html"
 
 
 # -----------------------------------------------------------------
@@ -81,48 +82,38 @@ def login(session: requests.Session):
 # ---------------------------------------------------
 # GET HIDDEN FORM FIELDS
 # ---------------------------------------------------
-def fetch_metadata(session: requests.Session, dwelling_id: str):
-  meta_url = (
-    "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
-    f"?type=Form"
-    f"&formActionKey=reageren"
-    f"&action=reageren"
-    f"?dwellingID={dwelling_id}"
-  )
-  r = session.get(meta_url)
+def fetch_form_fields(session):
+  r = session.get(FORM_URL)
   if r.status_code != 200:
-    raise Exception(f"Metadata fetch failed {r.status_code}")
-  data = r.json()
+    raise Exception("Failed to load ReageerForm.html")
+  soup = BeautifulSoup(r.text, "html.parser")
+  form = soup.find("form", attr={"name": "reactForm"})
+  if not form:
+    raise Exception("reactForm not found in ReageerForm.html")
+  fields = {}
 
-    # TEMPORARY DEBUGGING
-  print("DEBUG URL:", meta_url)
-  print("DEBUG STATUS:", r.status_code)
-  print("DEBUG RAW RESPONSE:", r.text)
+  for inp in form.find_all("input"):
+    name = inp.get("name")
+    if name:
+      fields[name] = inp.get("value","")
 
-  try:
-    data = r.json()
-  except Exception:
-    raise Exception("Metadata response is not json")
-    
-
-  if "initialValues" not in data:
-    raise Exception("Missing initialValues in metadata JSON")
-
-  vals = data["initialValues"]
   required = ["__id__", "__hash__", "add", "dwellingID"]
-  for k in required:
-    if k not in vals:
-      raise Exception(f"Missing required field in metadata: {k}")
-  return vals
-
+  for key in required:
+    if key not in fields:
+      raise Exception(f"Missing required field: {key}")
+  return fields
 # ---------
 # APPLY
 # ---------
-def apply_to_listing(session: requests.Session, fields:dict):
+def apply_to_listing(session, fields):
   r = session.post(APPLY_URL, json=fields)
   if r.status_code != 200:
     raise Exception(f"Apply failed {r.status_code} {r.text}")
   return r.json()
+
+# ----------------------------------------------------------------------
+# MAIN
+# ----------------------------------------------------------------------
 
 try:
   old_ids = json.load(open(CACHE_FILE))
@@ -137,15 +128,25 @@ if added:
   with requests.Session() as session:
     session.headers.update({"User-Agent": "Mozilla/5.0"})
     login(session)
+
+    
+    try:
+      form_fields = fetch_form_fields(session)
+    except Exception as e:
+      notify(f"Failed loading apply form fields: {e}")
+      raise e
+
+    
     msg_lines = []
     for item in added:
       dwelling_id = str(item["id"])
+      form_fields["dwellingID"] = dwelling_id
+      
       address = f"{item.get('street', '')} {item.get('houseNumber','')} {item.get('houseNumberAddition', '')}".strip()
       url_key = item.get("urlKey", "")
       detail_url = f"{PLAZA_BASE}/en/availables-places/living-place/details/{url_key}"
       try:
-        meta = fetch_metadata(session, dwelling_id)
-        apply_result = apply_to_listing(session, meta)
+        apply_result = apply_to_listing(session, form_fields)
         apply_msg = f"Applied successfully: {apply_result}"
       except Exception as e:
         apply_msg = f"Apply failed: {e}"
