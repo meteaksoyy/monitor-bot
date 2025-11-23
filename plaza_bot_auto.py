@@ -18,7 +18,8 @@ PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 PLAZA_BASE = "https://plaza.newnewnew.space"
 LOGIN_URL = "https://plaza.newnewnew.space/portal/proxy/frontend/api/v1/oauth/token"
 APPLY_URL = "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
-FORM_URL = "https://plaza.newnewnew.space/portal/html/angular-templates/objecten/shared/object/ReageerForm.html"
+META_URL = "https://plaza.newnewnew.space/portal/object/frontend/getreageerconfiguration/format/json"
+
 
 
 # -----------------------------------------------------------------
