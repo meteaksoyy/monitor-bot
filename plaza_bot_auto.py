@@ -88,7 +88,7 @@ def fetch_form_fields(session: requests.Session, url: str):
   soup = BeautifulSoup(r.text, "html.parser")
   form = soup.find("form", attrs={"name": "reactForm"})
   if not form:
-    raise Exception("Apply form not found - are you logged in?")
+    raise Exception("Apply form not found - is the form correct?")
   fields = {}
   for inp in form.find_all("input"):
     name = inp.get("name")
