@@ -1,0 +1,44 @@
+name: Monitor Bot
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # check every 10 minutes
+  workflow_dispatch:       # manual run
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with: 
+          python-version : "3.10"
+
+      - name: Install deps
+        run: pip install requests beautifulsoup4
+
+      - name: Load previous caches
+        run: | 
+          if [ ! -f plaza_cache_auto.json]; then echo "[]" > plaza_cache_auto.json; fi
+
+      - name: Run Auto Plaza bot
+        env: 
+          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+          BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+          BOT_TO: ${{ secrets.BOT_TO }}
+          BOT_TO_2: ${{ secrets.BOT_TO_2 }}
+          PLAZA_USERNAME: ${{ secrets.PLAZA_USERNAME }}
+          PLAZA_PASSWORD: ${{ secrets.PLAZA_PASSWORD }}
+        run: python plaza_bot_auto.py
+        
+      - name: Save updated caches
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: |
+            verra_cache.json
+            plaza_cache.json
+          message: "update caches"
+          default_author: github_actions
