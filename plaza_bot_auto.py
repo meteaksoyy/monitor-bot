@@ -16,8 +16,8 @@ PLAZA_USERNAME = os.environ["PLAZA_USERNAME"]
 PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 
 PLAZA_BASE = "https://plaza.newnewnew.space"
-LOGIN_URL = f"{PLAZA_BASE}/portaal/proxy/frontend/api/v1/oauth/token"
-APPLY_URL = f"{PLAZA_BASE}/portaal/object/frontend/react/format/json"
+LOGIN_URL = "https://plaza.newnewnew.space/portaal/proxy/frontend/api/v1/oauth/token"
+APPLY_URL = "https://plaza.newnewnew.space/portaal/object/frontend/react/format/json"
 
 
 # -----------------------------------------------------------------
@@ -61,10 +61,12 @@ def fetch_ids():
 # ------------------------------------------------
 def login(session: requests.Session):
   session.headers.update({
-    "User-Agent": "Mozilla/5.0",
-    "X-Requested-With": "XMLHttpRequest",
-    "Content-Type": "application/json"
-  })
+      "User-Agent": "Mozilla/5.0",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Origin": "https://plaza.newnewnew.space",
+      "Referer": "https://plaza.newnewnew.space/",
+  }
   payload = {
     "client_id": "wzp",
     "grant_type": "password",
