@@ -84,7 +84,10 @@ def login(session: requests.Session):
 def fetch_metadata(session: requests.Session, dwelling_id: str):
   meta_url = (
     "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
-    f"?dwellingID={dwelling_id}&action=reageren"
+    f"?type=Form"
+    f"&formActionKey=reageren"
+    f"&action=reageren"
+    f"?dwellingID={dwelling_id}"
   )
   r = session.get(meta_url)
   if r.status_code != 200:
