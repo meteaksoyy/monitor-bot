@@ -105,7 +105,7 @@ def fetch_form_fields(session: requests.Session, url: str):
 # APPLY
 # ---------
 def apply_to_listing(session: requests.Session, fields:dict):
-  r = session.post(APPLY_URL, data=fields)
+  r = session.post(APPLY_URL, json=fields)
   if r.status_code != 200:
     raise Exception(f"Apply failed {r.status_code} {r.text}")
   return r.json()
