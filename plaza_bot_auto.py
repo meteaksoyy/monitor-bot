@@ -73,7 +73,7 @@ def login(session: requests.Session):
     "username": PLAZA_USERNAME,
     "password": PLAZA_PASSWORD
   }
-  r = session.post(LOGIN_URL, json=payload)
+  r = session.post(LOGIN_URL, data=payload)
   if r.status_code != 200:
     raise Exception(f"Login failed: {r.status_code} {r.text}")
   return True
