@@ -94,6 +94,17 @@ def fetch_metadata(session: requests.Session, dwelling_id: str):
     raise Exception(f"Metadata fetch failed {r.status_code}")
   data = r.json()
 
+    # TEMPORARY DEBUGGING
+  print("DEBUG URL:", meta_url)
+  print("DEBUG STATUS:", r.status_code)
+  print("DEBUG RAW RESPONSE:", r.text)
+
+  try:
+    data = r.json()
+  except Exception:
+    raise Exception("Metadata response is not json")
+    
+
   if "initialValues" not in data:
     raise Exception("Missing initialValues in metadata JSON")
 
