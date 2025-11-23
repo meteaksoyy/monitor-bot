@@ -83,8 +83,9 @@ def login(session: requests.Session):
 # ---------------------------------------------------
 # GET HIDDEN FORM FIELDS
 # ---------------------------------------------------
-def fetch_metadata(session):
-  r = session.get(META_URL)
+def fetch_metadata(session, dwelling_id):
+  url = f"{META_URL}?dwellingID={dwelling_id}"
+  r = session.get(url)
   if r.status_code != 200:
     raise Exception("Metadata fetch failed")
 
@@ -140,17 +141,15 @@ added = [item for item in new_items if item["id"] not in old_ids]
 if added:
   with requests.Session() as session:
     login(session)
-    try:
-      base_metadata = fetch_metadata(session)
-    except Exception as e:
-      notify(f"Metadata fetch error: {e}")
-      raise e
-
-    
+  
     msg_lines = []
     for item in added:
-      meta = base_metadata.copy()
-      meta["dwellingID"] = str(item["id"])
+      dwelling_id = str(item["id"])
+      try:
+        meta = fetch_metadata(session, dwelling_id)
+      except Exception as e:
+        notify(f"Metadata fetch error for ID {dwelling_id}: {e}")
+        continue
       
       address = f"{item.get('street', '')} {item.get('houseNumber','')} {item.get('houseNumberAddition', '')}".strip()
       url_key = item.get("urlKey", "")
