@@ -97,12 +97,12 @@ def fetch_metadata(session: requests.Session, dwelling_id: str):
   if "initialValues" not in data:
     raise Exception("Missing initialValues in metadata JSON")
 
-vals = data["initialValues"]
-required = ["__id__", "__hash__", "add", "dwellingID"]
-for k in required:
-  if k not in vals:
-    raise Exception(f"Missing required field in metadata: {k}")
-return vals
+  vals = data["initialValues"]
+  required = ["__id__", "__hash__", "add", "dwellingID"]
+  for k in required:
+    if k not in vals:
+      raise Exception(f"Missing required field in metadata: {k}")
+  return vals
 
 # ---------
 # APPLY
