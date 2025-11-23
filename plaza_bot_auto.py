@@ -16,7 +16,7 @@ PLAZA_USERNAME = os.environ["PLAZA_USERNAME"]
 PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 
 PLAZA_BASE = "https://plaza.newnewnew.space"
-LOGIN_URL = f"{PLAZA_BASE}/portaal/proxy/frontend/api/v1/oauth/token"
+LOGIN_URL = f"{PLAZA_BASE}/portaal/account/frontend/loginservice/format/json"
 APPLY_URL = f"{PLAZA_BASE}/portaal/object/frontend/react/format/json"
 
 
@@ -61,12 +61,12 @@ def fetch_ids():
 # ------------------------------------------------
 def login(session: requests.Session):
   payload = {
-    "client_id": "wzp",
-    "grant_type": "password",
-    "username": PLAZA_USERNAME,
-    "password": PLAZA_PASSWORD,
+    "gebruikersnaam": PLAZA_USERNAME,
+    "wachtwoord": PLAZA_PASSWORD,
+    "language": "en",
+    "service": "woonzakenportaal"
   }
-  r = session.post(LOGIN_URL, data=payload)
+  r = session.post(LOGIN_URL, json=payload)
   if r.status_code != 200:
     raise Exception(f"Login failed: {r.status_code} {r.text}")
   return True
