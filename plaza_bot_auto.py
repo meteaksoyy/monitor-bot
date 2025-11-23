@@ -61,10 +61,10 @@ def fetch_ids():
 # ------------------------------------------------
 def login(session: requests.Session):
   payload = {
-    "gebruikersnaam": PLAZA_USERNAME,
-    "wachtwoord": PLAZA_PASSWORD,
-    "language": "en",
-    "service": "woonzakenportaal"
+    "client_id": "wzp",
+    "grant_type": "password",
+    "username": PLAZA_USERNAME,
+    "password": PLAZA_PASSWORD
   }
   r = session.post(LOGIN_URL, json=payload)
   if r.status_code != 200:
