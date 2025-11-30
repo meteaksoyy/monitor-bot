@@ -118,6 +118,7 @@ def apply_to_listing(driver, item):
 # MAIN LOGIC
 # -------------------------------------------------------------
 def main():
+    print("Entered main")
     new_listings = fetch_new_listings()
     if not new_listings:
         return
@@ -138,6 +139,7 @@ def main():
             results.append(f"Apply failed for listing {listing_id}: {msg}")
     driver.quit()
     notify("\n".join(results))
-
+print("Before Main")
 if __name__ == "__main__":
     main()
+print("After main")
