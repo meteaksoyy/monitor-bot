@@ -86,47 +86,39 @@ def find_in_shadow(driver, element, selector):
 def login(driver):
     print("DEBUG: Opening home page…")
     driver.get("https://plaza.newnewnew.space/")
-    time.sleep(2)
-
-    print("DEBUG: Locating shadow host…")
-
-    # Step 1 — locate the shadow host
-    host = WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "zds-navigation-body.login-plugin-container"))
-    )
-
-    print("DEBUG: Expanding shadow root…")
-    shadow = driver.execute_script("return arguments[0].shadowRoot", host)
-    if shadow is None:
-        raise Exception("Shadow root is NULL")
-
-    print("DEBUG: Searching for internal login link…")
-
-    # Step 2 — find <a> or <div> inside the shadow root
-    login_el = driver.execute_script("""
-        return arguments[0].querySelector('zds-navigation-link a, zds-navigation-link div, a.navigation-link');
-    """, shadow)
-
-    if not login_el:
-        driver.save_screenshot("debug_no_login_element.png")
-        raise Exception("Could not find login element inside shadow root")
-
-    print("DEBUG: Clicking login element…")
-    driver.execute_script("arguments[0].click();", login_el)
     time.sleep(1)
 
-    print("DEBUG: Waiting for login fields…")
+    # Accept cookies if present
+    try:
+        WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))
+        ).click()
+        print("DEBUG: Cookie popup dismissed")
+    except:
+        pass
 
-    WebDriverWait(driver, 20).until(
+    print("DEBUG: Clicking INLOGGEN…")
+    try:
+        login_btn = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(., 'Inloggen')]"))
+        )
+        login_btn.click()
+        print("Clicked login button")
+    except Exception as e:
+        print("DEBUG ERROR: Could not click Inloggen:", e)
+        driver.save_screenshot("debug_login_fail.png")
+        raise
+
+    # Wait for login page inputs
+    username = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))
     )
+    username.send_keys(PLAZA_USERNAME)
 
-    driver.find_element(By.NAME, "tx_felogin_pi1[username]").send_keys(PLAZA_USERNAME)
     driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
     driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
 
-    print("DEBUG: Login form submitted, waiting for redirect…")
-    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
+    print("DEBUG: Login submitted")
 
 
 # -------------------------------------------------------------
