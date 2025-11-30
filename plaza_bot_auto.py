@@ -76,7 +76,7 @@ def create_driver():
     opts.add_argument("--window-size=1920,1080")
     return webdriver.Chrome(options=opts)
     
-def get_shadow(driver, host):
+def expand_shadow(driver, host):
     return driver.execute_script("return arguments[0].shadowRoot", host)
 
 # -------------------------------------------------------------
