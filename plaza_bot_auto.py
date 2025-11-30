@@ -128,7 +128,7 @@ def login(driver):
     print("Clicked login submit")
     driver.save_screenshot("after_submit.png")
     # Wait for redirect
-    WebDriverWait(driver, 25).until(EC.contains("portaal"))
+    WebDriverWait(driver, 25).until(EC.url_contains("portaal"))
 
 # -------------------------------------------------------------
 # APPLY
