@@ -86,6 +86,16 @@ def login(driver):
     time.sleep(2)
     print("DEBUG: Page title =", driver.title)
     print("DEBUG: Clicking login button…")
+    # Try dismissing cookie banner
+    try:
+        accept_btn = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))
+        )
+        accept_btn.click()
+        print("DEBUG: Cookie banner dismissed")
+    except:
+        pass  # No cookie banner
+        
     try:
         login_btn = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen') or contains(., 'Login')]")))
         login_btn.click()
