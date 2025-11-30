@@ -155,29 +155,36 @@ def apply_to_listing(driver, item):
 # MAIN LOGIC
 # -------------------------------------------------------------
 def main():
-    print("Entered main")
-    new_listings = fetch_new_listings()
-    if not new_listings:
-        print("No new listings")
-        return
-    driver = create_driver()
-    try:
-        login(driver)
-        print("Logged in")
-    except Exception as e:
-        notify(f"Login failed: {e}")
-        driver.quit()
-        return
-    results = []
-    for item in new_listings:
-        ok, msg = apply_to_listing(driver, item)
-        listing_id = item["id"]
-        if ok:
-            results.append(f"Applied successfully for listing {listing_id}")
-        else:
-            results.append(f"Apply failed for listing {listing_id}: {msg}")
-    driver.quit()
-    notify("\n".join(results))
+    print("Bot started (loop mode)")
+    while True:
+        try:      
+            new_listings = fetch_new_listings()
+            if not new_listings:
+                print("No new listings")
+                continue
+            driver = create_driver()
+            try:
+                login(driver)
+                print("Logged in")
+            except Exception as e:
+                notify(f"Login failed: {e}")
+                driver.quit()
+                continue
+            results = []
+            for item in new_listings:
+                ok, msg = apply_to_listing(driver, item)
+                listing_id = item["id"]
+                if ok:
+                    results.append(f"Applied successfully for listing {listing_id}")
+                else:
+                    results.append(f"Apply failed for listing {listing_id}: {msg}")
+            driver.quit()
+            notify("\n".join(results))
+
+        except Exception as e:
+            notify(f"Bot crashed: {e}")
+        time.sleep(15) # check every 15 seconds
+    
     
 print("Before Main")
 if __name__ == "__main__":
