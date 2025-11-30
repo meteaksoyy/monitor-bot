@@ -87,7 +87,7 @@ def login(driver):
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))).send_keys(PLAZA_USERNAME)
     driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
     driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
-    WebDriverWait(driver, 20).until(EC.url_contains("mijn"))
+    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
 
 
 
