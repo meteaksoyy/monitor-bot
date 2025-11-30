@@ -123,8 +123,7 @@ def login(driver):
     print("Found host for submit")
     submit_shadow = expand_shadow(driver, submit_host)
     print("Found shadow root for submit")
-    submit_btn = submit_shadow.find_element(By.CSS_SELECTOR, "zds-button")
-    submit_btn.click()
+    driver.execute_script("arguments[0].click()", submit_host)
     print("Clicked login submit")
 
     # Wait for redirect
