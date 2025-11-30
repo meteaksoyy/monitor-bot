@@ -74,6 +74,7 @@ def create_driver():
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
     opts.add_argument("--window-size=1920,1080")
+    opts.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
     return webdriver.Chrome(options=opts)
     
 def expand_shadow(driver, host):
@@ -127,7 +128,7 @@ def login(driver):
     print("Clicked login submit")
 
     # Wait for redirect
-    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
+    WebDriverWait(driver, 25).until(EC.url_contains("portaal"))
 
 # -------------------------------------------------------------
 # APPLY
