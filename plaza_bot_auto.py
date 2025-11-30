@@ -76,9 +76,8 @@ def create_driver():
     opts.add_argument("--window-size=1920,1080")
 
     return webdriver.Chrome(options=opts)
-
-def find_in_shadow(driver, element, selector):
-    return driver.execute.script("return arguments[0].shadowRoot.querySelector(arguments[1])", element, selector)
+def expand_shadow(driver, element):
+    return driver.execute_script("return arguments[0].shadowRoot", element)
 
 # -------------------------------------------------------------
 # LOGIN
@@ -110,16 +109,34 @@ def login(driver):
         raise
 
     # Wait for login page inputs
-    username = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))
+    username_host = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "zds-input-text[name='username']"))
     )
-    username.send_keys(PLAZA_USERNAME)
+    print("DEBUG: Locating shadow username field…")
+    username_shadow = expand_shadow(driver, username_host)
+    username_input = username_shadow.find_element(By.CSS_SELECTOR, "input")
+    username_input.clear()
+    username_input.send_keys(PLAZA_USERNAME)
+    print("DEBUG: Username entered")
+    
+    print("DEBUG: Locating shadow password field…")
+    password_host = driver.find_element(By.CSS_SELECTOR, "zds-input-text[name='password']")
+    password_shadow = expand_shadow(driver, password_host)
+    password_input = password_shadow.find_element(By.CSS_SELECTOR, "input")
 
-    driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
-    driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
+    password_input.clear()
+    password_input.send_keys(PLAZA_PASSWORD)
+    print("DEBUG: Password entered")
+
+    # CLICK SUBMIT BUTTON
+    print("DEBUG: Clicking login submit…")
+    submit_btn = driver.find_element(By.CSS_SELECTOR, "zds-button[type='submit']")
+    submit_btn.click()
 
     print("DEBUG: Login submitted")
 
+    WebDriverWait(driver, 15).until(EC.url_contains("portaal"))
+    print("DEBUG: LOGGED IN")
 
 # -------------------------------------------------------------
 # APPLY
