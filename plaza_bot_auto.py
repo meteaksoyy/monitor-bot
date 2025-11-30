@@ -68,6 +68,7 @@ def fetch_new_listings():
 
 # Selenium
 def create_driver():
+    print("in create_driver method")
     opts = Options()
     opts.add_argument("--headless=new")
     opts.add_argument("--no-sandbox")
@@ -80,6 +81,7 @@ def create_driver():
 # LOGIN
 # -------------------------------------------------------------
 def login(driver):
+    print("in login method")
     driver.get("https://plaza.newnewnew.space/")
     login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href*='inloggen']")))
     login_btn.click()
