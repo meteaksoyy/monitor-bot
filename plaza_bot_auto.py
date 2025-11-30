@@ -22,8 +22,6 @@ TO_2 = os.environ["BOT_TO_2"]
 PLAZA_USERNAME = os.environ["PLAZA_USERNAME"]
 PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 
-LOGIN_URL = f"{PLAZA_BASE}/portal/proxy/frontend/api/v1/oauth/token"
-
 
 # -------------------------------------------------------------
 # EMAIL NOTIFICATIONS
@@ -83,8 +81,9 @@ def create_driver():
 # LOGIN
 # -------------------------------------------------------------
 def login(driver):
-    driver.get(LOGIN_URL)
-
+    driver.get("https://plaza.newnewnew.space/")
+    login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href*='inloggen']")))
+    login_btn.click()
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))).send_keys(PLAZA_USERNAME)
     driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
     driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
