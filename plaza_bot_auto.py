@@ -83,60 +83,33 @@ def expand_shadow(driver, element):
 # LOGIN
 # -------------------------------------------------------------
 def login(driver):
-    print("DEBUG: Opening home page…")
     driver.get("https://plaza.newnewnew.space/")
-    time.sleep(1)
-
-    # Accept cookies if present
-    try:
-        WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))
-        ).click()
-        print("DEBUG: Cookie popup dismissed")
-    except:
-        pass
-
-    print("DEBUG: Clicking INLOGGEN…")
-    try:
-        login_btn = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[contains(., 'Inloggen')]"))
-        )
-        login_btn.click()
-        print("Clicked login button")
-    except Exception as e:
-        print("DEBUG ERROR: Could not click Inloggen:", e)
-        driver.save_screenshot("debug_login_fail.png")
-        raise
-
-    # Wait for login page inputs
-    username_host = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "zds-input-text[name='username']"))
-    )
-    print("DEBUG: Locating shadow username field…")
-    username_shadow = expand_shadow(driver, username_host)
-    username_input = username_shadow.find_element(By.CSS_SELECTOR, "input")
-    username_input.clear()
-    username_input.send_keys(PLAZA_USERNAME)
-    print("DEBUG: Username entered")
     
-    print("DEBUG: Locating shadow password field…")
-    password_host = driver.find_element(By.CSS_SELECTOR, "zds-input-text[name='password']")
-    password_shadow = expand_shadow(driver, password_host)
-    password_input = password_shadow.find_element(By.CSS_SELECTOR, "input")
+    # Click the INLOGGEN button
+    login_btn = WebDriverWait(driver, 15).until(
+        EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen')]"))
+    )
+    login_btn.click()
+    print("Clicked login button")
 
-    password_input.clear()
+    # Fill username
+    username_input = WebDriverWait(driver, 15).until(
+        EC.element_to_be_clickable((By.XPATH, "//input[@name='username']"))
+    )
+    username_input.send_keys(PLAZA_USERNAME)
+    print("sent username keys")
+    # Fill password
+    password_input = WebDriverWait(driver, 15).until(
+        EC.element_to_be_clickable((By.XPATH, "//input[@name='password']"))
+    )
     password_input.send_keys(PLAZA_PASSWORD)
-    print("DEBUG: Password entered")
-
-    # CLICK SUBMIT BUTTON
-    print("DEBUG: Clicking login submit…")
-    submit_btn = driver.find_element(By.CSS_SELECTOR, "zds-button[type='submit']")
+    print("sent password keys")
+    # Submit
+    submit_btn = driver.find_element(By.XPATH, "//button[@type='submit']")
     submit_btn.click()
-
-    print("DEBUG: Login submitted")
-
-    WebDriverWait(driver, 15).until(EC.url_contains("portaal"))
-    print("DEBUG: LOGGED IN")
+    print("clicked submit button")
+    # Wait for redirect
+    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
 
 # -------------------------------------------------------------
 # APPLY
