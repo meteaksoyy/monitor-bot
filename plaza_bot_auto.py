@@ -81,15 +81,45 @@ def create_driver():
 # LOGIN
 # -------------------------------------------------------------
 def login(driver):
-    print("in login method")
+    print("DEBUG: Opening home page…")
     driver.get("https://plaza.newnewnew.space/")
-    login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href*='inloggen']")))
-    login_btn.click()
-    WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))).send_keys(PLAZA_USERNAME)
+    time.sleep(2)
+    print("DEBUG: Page title =", driver.title)
+    print("DEBUG: Clicking login button…")
+    try:
+        login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href*='inloggen']")))
+        login_btn.click()
+    except Exception as e:
+        print("DEBUG ERROR: Could not click login button:", e)
+        driver.save_screenshot("debug_no_login_button.png")
+        raise
+    time.sleep(2)
+    print("DEBUG: Current URL after clicking =", driver.current_url)
+
+    # DEBUG: Dump page HTML to inspect
+    html = driver.page_source
+    open("debug_login_html.html", "w", encoding="utf-8").write(html)
+    print("DEBUG: Saved page to debug_login_html.html")
+
+    try:
+        user_field = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]")))
+    except Exception as e:
+        print("DEBUG ERROR: Username field not found:", e)
+        driver.save_screenshot("debug_no_username_field.png")
+        raise
+    user_field.send_keys(PLAZA_USERNAME)
     driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
     driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
-    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
 
+    print("DEBUG: Submitted login")
+    try:
+        WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
+    except:
+        print("DEBUG ERROR: Login did not redirect correctly")
+        driver.save_screenshot("debug_login_failed.png")
+        raise
+
+    print("DEBUG: Login SUCCESSFUL. URL =", driver.current_url)
 
 
 # -------------------------------------------------------------
