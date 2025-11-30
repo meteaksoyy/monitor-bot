@@ -120,13 +120,11 @@ def login(driver):
     print("Typed password")
 
     # --- SUBMIT BUTTON ---
-    submit_host = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CSS_SELECTOR, "zds-button[type='submit']")))
-    print("Found host for submit")
-    submit_shadow = expand_shadow(driver, submit_host)
-    print("Found shadow root for submit")
-    driver.execute_script("arguments[0].click()", submit_host)
-    print("Clicked login submit")
-    driver.save_screenshot("after_submit.png")
+    submit_host = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "zds-button[type='submit']")))
+    driver.execute_script("arguments[0].scrollIntoView(true);", submit_host)
+    time.sleep(0.3)
+    submit_host.click()
+    print("Clicked login submit host")
     # Wait for redirect
     WebDriverWait(driver, 25).until(EC.url_contains("portaal"))
 
